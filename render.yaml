@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: resume_corrector
+    runtime: docker
+    plan: free
+    repo: https://github.com/Ansar331/backend.git
+    region: frankfurt
+    branch: main
+    buildFilter:
+      paths:
+        - ./**

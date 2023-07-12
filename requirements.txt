@@ -1,8 +1,8 @@
-fastapi
+fastapi == 0.99.1
 httpx
 uvicorn
-openai
-pydantic
+openai == 0.27.8
+pydantic == 1.10.10
 passlib
 sqlite-utils
 python-dotenv
