@@ -15,7 +15,7 @@ openai.api_key = config["OPEN_API_KEY"]
 messages = []
 
 origins = [
-    "https://resume-frontend-l7yg.onrender.com",  # Замените на URL вашего Next.js-сервера
+    "https://resume-frontend-five.vercel.app/",  # Замените на URL вашего Next.js-сервера
     "http://localhost:8000",  # Замените на URL вашего FastAPI-сервера
 ]
 
