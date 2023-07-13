@@ -16,7 +16,7 @@ messages = []
 
 origins = [
     "https://resume-frontend-five.vercel.app/",  # Замените на URL вашего Next.js-сервера
-    "http://localhost:8000",  # Замените на URL вашего FastAPI-сервера
+    "https://resume-corrector.onrender.com",  # Замените на URL вашего FastAPI-сервера
 ]
 
 app.add_middleware(
