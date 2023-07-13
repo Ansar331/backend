@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from passlib.context import CryptContext
 import sqlite3, os
 from dotenv import dotenv_values
+import requests
 import openai
 
 app = FastAPI()
@@ -13,6 +14,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 config = dotenv_values(".env")
 openai.api_key = config["OPEN_API_KEY"]
 messages = []
+messages2 = []
 
 origins = [
     "https://resume-frontend-five.vercel.app",  # Замените на URL вашего Next.js-сервера
@@ -63,7 +65,28 @@ def profession_resume_handler(profession_data: Prof_AnalyzeRequest):
     reply = chat.choices[0].message.content
     messages.append({"role":"assistant", "content": reply})
     save_query(QueryRequest(user_id=profession_data.user_id, query=reply))  # Используем query=reply
-    return {"message": reply}
+    messages2.append({"role": "user", "content": f'напиши мне из данного текста ТОЛЬКО ЛИШЬ все профессии, должности и работы без нумераций и объяснений, только через проблема {reply}'})
+    chat2 = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages = messages2)
+    reply2 = chat2.choices[0].message.content
+    words = reply2
+    word_list = [word.strip() for word in words.split(",")]
+    count = len(word_list)
+    url = 'https://api.hh.ru/vacancies'
+    params = {
+        'text': word_list[0],
+        'per_page': 5  # Количество вакансий, которые вы хотите получить
+    }
+    spisok_rabot = []
+    response = requests.get(url, params=params)
+    data = response.json()
+    vacancies = data['items']
+    for vacancy in vacancies:
+        vacancy_id = vacancy['id']
+        vacancy_link = f'https://hh.ru/vacancy/{vacancy_id}'
+        spisok_rabot.append(vacancy_link)
+    output = ', '.join(spisok_rabot)
+    return {"message": f'{reply}   !Вот ваш список вакансий: {output}'} 
+
 
 @app.post("/queries")
 def save_query(query_request: QueryRequest):
