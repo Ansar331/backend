@@ -13,7 +13,6 @@ security = HTTPBasic()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 config = dotenv_values(".env")
 openai.api_key = config["OPEN_API_KEY"]
-messages = []
 messages2 = []
 
 origins = [
@@ -44,6 +43,7 @@ class QueryRequest(BaseModel):
 
 @app.post("/imp")
 def imp_resume_handler(imp_data: ImproveRequest):
+    messages = []
     pdf_text = imp_data.file
     message = imp_data.data  
     messages.append({"role": "user", "content": f'Перепиши и улучши это резюме "{pdf_text}" под должность {message}'})
@@ -57,6 +57,7 @@ def imp_resume_handler(imp_data: ImproveRequest):
 
 @app.post("/prof")
 def profession_resume_handler(profession_data: Prof_AnalyzeRequest):
+    messages = []
     # Process the resume data
     # Example processing, you can replace it with your own logic
     message = profession_data.data  
@@ -101,6 +102,7 @@ def save_query(query_request: QueryRequest):
 
 @app.post("/analyze")
 def analyze_resume_handler(analyze_data: Prof_AnalyzeRequest):
+    messages = []
     # Process the resume data
     # Example processing, you can replace it with your own logic
     message = analyze_data.data
