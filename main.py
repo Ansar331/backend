@@ -85,8 +85,11 @@ def profession_resume_handler(profession_data: Prof_AnalyzeRequest):
         vacancy_id = vacancy['id']
         vacancy_link = f'https://hh.ru/vacancy/{vacancy_id}'
         spisok_rabot.append(vacancy_link)
-    output = ', '.join(spisok_rabot)
-    return {"message": f'{reply}   !Вот ваш список вакансий: {output}'} 
+    output = '<br>'.join([f'<a href="{link}">{link}</a>' for link in spisok_rabot])
+    output2 = ', '.join(spisok_rabot)
+    if output2 == '':
+        output = 'Ничего не удалось найти'
+    return {"message": f'{reply}   Вот ваш список вакансий: <br>{output}'} 
 
 
 @app.post("/queries")
@@ -120,7 +123,7 @@ def get_queries(user_id: str):
     # Получаем все запросы для определенного пользователя из базы данных
     conn = sqlite3.connect('history.db')
     c = conn.cursor()
-    c.execute("SELECT reply FROM queries WHERE user_id = ?", (user_id,))
+    c.execute("SELECT reply FROM queries WHERE user_id = ? ORDER BY ROWID DESC", (user_id,))  # Use ORDER BY ROWID DESC to retrieve queries in reverse order
     rows = c.fetchall()
     queries = [row[0] for row in rows]
     conn.close()
