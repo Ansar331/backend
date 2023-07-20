@@ -1,4 +1,9 @@
 from fastapi import FastAPI, HTTPException, Depends, File, UploadFile, Request
+from typing_extensions import Annotated
+import io
+import PyPDF2
+import random
+import psycopg2
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel
