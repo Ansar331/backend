@@ -18,6 +18,7 @@ security = HTTPBasic()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 config = dotenv_values(".env")
 openai.api_key = config["OPEN_API_KEY"]
+messages = []
 messages2 = []
 
 origins = [
