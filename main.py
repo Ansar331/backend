@@ -95,7 +95,7 @@ async def profession_resume_handler(
     count = len(word_list)
     url = 'https://api.hh.ru/vacancies'
     params = {
-        'text': word_list[random.randint(0, count)],
+        'text': word_list[0],
         'per_page': 5  # Количество вакансий, которые вы хотите получить
     }
     spisok_rabot = []
