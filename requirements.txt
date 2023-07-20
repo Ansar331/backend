@@ -10,3 +10,4 @@ requests
 typing-extensions
 PyPDF2
 psycopg2
+python-multipart
