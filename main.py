@@ -56,11 +56,26 @@ def imp_resume_handler(imp_data: ImproveRequest):
     return {"message": reply}
 
 @app.post("/prof")
-def profession_resume_handler(profession_data: Prof_AnalyzeRequest):
-    messages = []
+async def profession_resume_handler(
+        file: Annotated[UploadFile, File()],
+        user_id: Annotated[str, Form()]
+):
     # Process the resume data
     # Example processing, you can replace it with your own logic
-    message = profession_data.data  
+    pdf_file_bytes = await file.read()
+    pdf_reader = PyPDF2.PdfReader(io.BytesIO(pdf_file_bytes))
+
+    # Инициализируем переменную для хранения текста из всех страниц
+    all_text = ""
+
+    # Получаем количество страниц в документе
+    num_pages = len(pdf_reader.pages)
+
+    # Читаем содержимое каждой страницы и добавляем в переменную all_text
+    for page_num in range(num_pages):
+        page = pdf_reader.pages[page_num]
+        all_text += page.extract_text()
+    message = all_text
     messages.append({"role": "user", "content": "Какие професси подходят под данное резюме: " + message})
     chat = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages = messages)
     reply = chat.choices[0].message.content
@@ -74,7 +89,7 @@ def profession_resume_handler(profession_data: Prof_AnalyzeRequest):
     count = len(word_list)
     url = 'https://api.hh.ru/vacancies'
     params = {
-        'text': word_list[0],
+        'text': word_list[random.randint(0, count)],
         'per_page': 5  # Количество вакансий, которые вы хотите получить
     }
     spisok_rabot = []
@@ -102,22 +117,38 @@ def save_query(query_request: QueryRequest):
     conn.commit()
     conn.close()
     return {"message": "Query saved successfully"}
-
+    
 @app.post("/analyze")
-def analyze_resume_handler(analyze_data: Prof_AnalyzeRequest):
-    messages = []
+async def analyze_resume_handler(
+        file: Annotated[UploadFile, File()],
+        user_id: Annotated[str, Form()]
+):
     # Process the resume data
     # Example processing, you can replace it with your own logic
-    message = analyze_data.data
+    pdf_file_bytes = await file.read()
+    pdf_reader = PyPDF2.PdfReader(io.BytesIO(pdf_file_bytes))
+
+    # Инициализируем переменную для хранения текста из всех страниц
+    all_text = ""
+
+    # Получаем количество страниц в документе
+    num_pages = len(pdf_reader.pages)
+
+    # Читаем содержимое каждой страницы и добавляем в переменную all_text
+    for page_num in range(num_pages):
+        page = pdf_reader.pages[page_num]
+        all_text += page.extract_text()
+    message = all_text
+    # message = analyze_data.data
     messages.append({"role": "user", "content": "Сделай объективный анализ данного резюме: " + message})
     chat = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=messages)
     reply = chat.choices[0].message.content
     messages.append({"role": "assistant", "content": reply})
     # Сохраняем reply вместо query_request.query
-    save_query(QueryRequest(user_id=analyze_data.user_id, query=reply))  # Используем query=reply
+    save_query(QueryRequest(user_id=user_id, query=reply))  # Используем query=reply
     # Return the processed data
     return {"message": reply}
-
+    
 @app.get("/queries/{user_id}")
 def get_queries(user_id: str):
     # Получаем все запросы для определенного пользователя из базы данных
