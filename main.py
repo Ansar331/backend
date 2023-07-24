@@ -173,12 +173,14 @@ def get_queries(user_id: str):
     conn = get_db_conn()
     with conn:
         # Получаем все запросы для определенного пользователя из базы данных
-        query = "SELECT reply FROM queries WHERE user_id = %s ORDER BY id DESC"  # Заменяем ROWID на id или другой подходящий столбец
-        rows = execute_query(query, (user_id,), fetchall=True)
+        query = "SELECT reply FROM queries WHERE user_id = %s ORDER BY user_id DESC"
+        cur = conn.cursor()
+        cur.execute(query, (user_id,))
+        rows = cur.fetchall()
         queries = [row[0] for row in rows]
 
     return {"queries": queries}
-    
+
 @app.delete("/queries")
 def delete_query(query_request: QueryRequest):
     # Delete the specific query from the PostgreSQL database
