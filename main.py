@@ -16,6 +16,7 @@ import openai
 app = FastAPI()
 security = HTTPBasic()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+DATABASE_URL = "postgres://history_6l1z_user:3aKwLmkc4P4mghSZBnTPWc8qa9wSiMZl@dpg-civ2765iuiedpv4ukhcg-a.frankfurt-postgres.render.com/history_6l1z"
 config = dotenv_values(".env")
 openai.api_key = config["OPEN_API_KEY"]
 messages2 = []
@@ -112,16 +113,27 @@ async def profession_resume_handler(
         output = 'Ничего не удалось найти'
     return {"message": f'{reply}   Вот ваш список вакансий: <br>{output}'} 
 
+def get_db_conn():
+    return psycopg2.connect(DATABASE_URL)
+
+def execute_query(query, args=None, fetchall=False):
+    conn = get_db_conn()
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(query, args)
+            if fetchall:
+                return cur.fetchall()
+    conn.close()
 
 @app.post("/queries")
 def save_query(query_request: QueryRequest):
-    # Сохраняем запрос в базе данных
-    conn = sqlite3.connect('history.db')
-    c = conn.cursor()
-    c.execute("CREATE TABLE IF NOT EXISTS queries (user_id TEXT, reply TEXT)")  # Изменяем схему таблицы, чтобы использовать столбец 'reply'
-    c.execute("INSERT INTO queries (user_id, reply) VALUES (?, ?)", (query_request.user_id, query_request.query))  # Используем query_request.query
-    conn.commit()
-    conn.close()
+    # Save the query in the PostgreSQL database
+    query = "CREATE TABLE IF NOT EXISTS queries (user_id TEXT, reply TEXT)"
+    execute_query(query)
+
+    query = "INSERT INTO queries (user_id, reply) VALUES (%s, %s)"
+    execute_query(query, (query_request.user_id, query_request.query))
+
     return {"message": "Query saved successfully"}
     
 @app.post("/analyze")
@@ -158,21 +170,16 @@ async def analyze_resume_handler(
     
 @app.get("/queries/{user_id}")
 def get_queries(user_id: str):
-    # Получаем все запросы для определенного пользователя из базы данных
-    conn = sqlite3.connect('history.db')
-    c = conn.cursor()
-    c.execute("SELECT reply FROM queries WHERE user_id = ? ORDER BY ROWID DESC", (user_id,))  # Use ORDER BY ROWID DESC to retrieve queries in reverse order
-    rows = c.fetchall()
+    # Retrieve all queries for a specific user from the PostgreSQL database
+    query = "SELECT reply FROM queries WHERE user_id = %s ORDER BY ROWID DESC"
+    rows = execute_query(query, (user_id,), fetchall=True)
     queries = [row[0] for row in rows]
-    conn.close()
     return {"queries": queries}
-
+    
 @app.delete("/queries")
 def delete_query(query_request: QueryRequest):
-    conn = sqlite3.connect('history.db')
-    c = conn.cursor()
-    # Delete the specific query from the database
-    c.execute("DELETE FROM queries WHERE user_id = ? AND reply = ?", (query_request.user_id, query_request.query))
-    conn.commit()
-    conn.close()
+    # Delete the specific query from the PostgreSQL database
+    query = "DELETE FROM queries WHERE user_id = %s AND reply = %s"
+    execute_query(query, (query_request.user_id, query_request.query))
+
     return {"message": "Query deleted successfully"}

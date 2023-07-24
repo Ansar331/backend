@@ -9,5 +9,5 @@ python-dotenv
 requests
 typing-extensions
 PyPDF2
-psycopg2
+psycopg2-binary
 python-multipart
