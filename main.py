@@ -165,3 +165,13 @@ def get_queries(user_id: str):
     queries = [row[0] for row in rows]
     conn.close()
     return {"queries": queries}
+
+@app.delete("/queries")
+def delete_query(query_request: QueryRequest):
+    conn = sqlite3.connect('history.db')
+    c = conn.cursor()
+    # Delete the specific query from the database
+    c.execute("DELETE FROM queries WHERE user_id = ? AND reply = ?", (query_request.user_id, query_request.query))
+    conn.commit()
+    conn.close()
+    return {"message": "Query deleted successfully"}
