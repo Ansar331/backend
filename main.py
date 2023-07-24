@@ -170,10 +170,13 @@ async def analyze_resume_handler(
     
 @app.get("/queries/{user_id}")
 def get_queries(user_id: str):
-    # Retrieve all queries for a specific user from the PostgreSQL database
-    query = "SELECT reply FROM queries WHERE user_id = %s ORDER BY ROWID DESC"
-    rows = execute_query(query, (user_id,), fetchall=True)
-    queries = [row[0] for row in rows]
+    conn = get_db_conn()
+    with conn:
+        # Получаем все запросы для определенного пользователя из базы данных
+        query = "SELECT reply FROM queries WHERE user_id = %s ORDER BY id DESC"  # Заменяем ROWID на id или другой подходящий столбец
+        rows = execute_query(query, (user_id,), fetchall=True)
+        queries = [row[0] for row in rows]
+
     return {"queries": queries}
     
 @app.delete("/queries")
