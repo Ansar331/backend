@@ -41,7 +41,6 @@ class Prof_AnalyzeRequest(BaseModel):
 class ImproveRequest(BaseModel):
     user_id: str
     file: str
-    data: str
 
 class QueryRequest(BaseModel):
     user_id: str
@@ -51,8 +50,7 @@ class QueryRequest(BaseModel):
 def imp_resume_handler(imp_data: ImproveRequest):
     messages = []
     pdf_text = imp_data.file
-    message = imp_data.data  
-    messages.append({"role": "user", "content": f'Перепиши и улучши это резюме "{pdf_text}" под должность {message}'})
+    messages.append({"role": "user", "content": f'Перепиши и улучши это резюме "{pdf_text}"'})
     chat = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages = messages)
     reply = chat.choices[0].message.content
     messages.append({"role":"assistant", "content": reply})
