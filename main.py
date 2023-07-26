@@ -157,7 +157,7 @@ async def analyze_resume_handler(
         all_text += page.extract_text()
     message = all_text
     # message = analyze_data.data
-    messages.append({"role": "user", "content": "Сделай объективный анализ данного резюме: " + message})
+    messages.append({"role": "user", "content": "Сделай объективный анализ данного резюме и напиши мне только лишь качественные советы, что убрать и что добавить: " + message})
     chat = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=messages)
     reply = chat.choices[0].message.content
     messages.append({"role": "assistant", "content": reply})
