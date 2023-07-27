@@ -50,7 +50,7 @@ class QueryRequest(BaseModel):
 def imp_resume_handler(imp_data: ImproveRequest):
     messages = []
     pdf_text = imp_data.file
-    messages.append({"role": "user", "content": f'Перепиши и улучши это резюме "{pdf_text}"'})
+    messages.append({"role": "user", "content": f'Создай простой шаблон для резюме и заполни его этими данными "{pdf_text}"'})
     chat = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages = messages)
     reply = chat.choices[0].message.content
     messages.append({"role":"assistant", "content": reply})
