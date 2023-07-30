@@ -86,7 +86,7 @@ async def profession_resume_handler(
     reply = chat.choices[0].message.content
     messages.append({"role":"assistant", "content": reply})
     save_query(QueryRequest(user_id=user_id, query=reply))  # Используем query=reply
-    messages2.append({"role": "user", "content": f'напиши мне из данного текста ТОЛЬКО ЛИШЬ все профессии, должности и работы без нумераций и объяснений, только через проблема {reply}'})
+    messages2.append({"role": "user", "content": f'напиши мне из данного текста ТОЛЬКО ЛИШЬ все профессии, должности и работы без нумераций и объяснений, только через запутяю {reply}'})
     chat2 = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages = messages2)
     reply2 = chat2.choices[0].message.content
     words = reply2
@@ -109,7 +109,7 @@ async def profession_resume_handler(
     output2 = ', '.join(spisok_rabot)
     if output2 == '':
         output = 'Ничего не удалось найти'
-    return {"message": f'{reply}   Вот ваш список вакансий: <br>{output}'} 
+    return {"message": reply, "links": output} 
 
 def get_db_conn():
     return psycopg2.connect(DATABASE_URL)
