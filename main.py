@@ -16,7 +16,7 @@ import openai
 app = FastAPI()
 security = HTTPBasic()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-DATABASE_URL = "postgres://history_6l1z_user:3aKwLmkc4P4mghSZBnTPWc8qa9wSiMZl@dpg-civ2765iuiedpv4ukhcg-a.frankfurt-postgres.render.com/history_6l1z"
+DATABASE_URL = "postgres://tiplar85:OZkqM3nvgVK4@ep-silent-sea-38069121.eu-central-1.aws.neon.tech/neondb"
 config = dotenv_values(".env")
 openai.api_key = config["OPEN_API_KEY"]
 messages2 = []
