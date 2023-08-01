@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel
 from passlib.context import CryptContext
-import sqlite3, os
+import sqlite3, os, re
 from dotenv import dotenv_values
 import requests
 import openai
