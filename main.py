@@ -142,6 +142,7 @@ async def analyze_resume_handler(
     # Process the resume data
     # Example processing, you can replace it with your own logic
     messages = []
+    messages3 = []
     pdf_file_bytes = await file.read()
     pdf_reader = PyPDF2.PdfReader(io.BytesIO(pdf_file_bytes))
 
@@ -161,10 +162,16 @@ async def analyze_resume_handler(
     chat = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=messages)
     reply = chat.choices[0].message.content
     messages.append({"role": "assistant", "content": reply})
+
+    messages3.append({"role": "user", "content": f"{message}Оцени данное резюме от 0 до 100 баллов (напиши только баллы, без объяснений)"})
+    chat3 = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=messages3)
+    reply3 = chat3.choices[0].message.content
+    numbers = re.findall(r'\d+', reply3)
+
     # Сохраняем reply вместо query_request.query
     save_query(QueryRequest(user_id=user_id, query=reply))  # Используем query=reply
     # Return the processed data
-    return {"message": reply}
+    return {"message": reply, "score": numbers[0]}
     
 @app.get("/queries/{user_id}")
 def get_queries(user_id: str):
