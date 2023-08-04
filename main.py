@@ -99,7 +99,7 @@ async def profession_resume_handler(
 
     messages2.append({"role": "user", "content": f'напиши мне из данного текста ТОЛЬКО ЛИШЬ все профессии, должности и работы без нумераций и объяснений, только через запутяю {reply}'})
     chat2 = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages = messages2)
-    reply2 = chat2.chsave_query(QueryRequest(user_id=user_id, query=reply))  # Используем query=replyoices[0].message.content
+    reply2 = chat2.choices[0].message.content
     words = reply2
     word_list = [word.strip() for word in words.split(",")]
     count = len(word_list)
