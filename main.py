@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel
 from passlib.context import CryptContext
-import sqlite3, os, re
+import sqlite3, os, re, string
 from dotenv import dotenv_values
 import requests
 import openai
@@ -54,7 +54,12 @@ def imp_resume_handler(imp_data: ImproveRequest):
     chat = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages = messages)
     reply = chat.choices[0].message.content
     messages.append({"role":"assistant", "content": reply})
-    save_query(QueryRequest(user_id=imp_data.user_id, query=reply))  # Используем query=reply
+    if user_id == '':
+        characters = string.ascii_letters + string.digits
+        random_word = ''.join(random.choice(characters) for _ in range(13))
+        save_query(QueryRequest(user_id=random_word, query=reply))  # Используем query=reply
+    else:
+        save_query(QueryRequest(user_id=imp_data.user_id, query=reply))  # Используем query=reply
 
     # Return the processed data
     return {"message": reply}
@@ -85,10 +90,16 @@ async def profession_resume_handler(
     chat = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages = messages)
     reply = chat.choices[0].message.content
     messages.append({"role":"assistant", "content": reply})
-    save_query(QueryRequest(user_id=user_id, query=reply))  # Используем query=reply
+    if user_id == ' ':
+        characters = string.ascii_letters + string.digits
+        random_word = ''.join(random.choice(characters) for _ in range(13))
+        save_query(QueryRequest(user_id=random_word, query=reply))  # Используем query=reply
+    else:
+        save_query(QueryRequest(user_id=user_id, query=reply))  # Используем query=reply
+
     messages2.append({"role": "user", "content": f'напиши мне из данного текста ТОЛЬКО ЛИШЬ все профессии, должности и работы без нумераций и объяснений, только через запутяю {reply}'})
     chat2 = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages = messages2)
-    reply2 = chat2.choices[0].message.content
+    reply2 = chat2.chsave_query(QueryRequest(user_id=user_id, query=reply))  # Используем query=replyoices[0].message.content
     words = reply2
     word_list = [word.strip() for word in words.split(",")]
     count = len(word_list)
@@ -169,7 +180,13 @@ async def analyze_resume_handler(
     numbers = re.findall(r'\d+', reply3)
 
     # Сохраняем reply вместо query_request.query
-    save_query(QueryRequest(user_id=user_id, query=reply))  # Используем query=reply
+    if user_id == ' ':
+        characters = string.ascii_letters + string.digits
+        random_word = ''.join(random.choice(characters) for _ in range(13))
+        save_query(QueryRequest(user_id=random_word, query=reply))  # Используем query=reply
+    else:
+        save_query(QueryRequest(user_id=user_id, query=reply))  # Используем query=reply
+
     # Return the processed data
     return {"message": reply, "score": numbers[0]}
     
