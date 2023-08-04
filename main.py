@@ -46,7 +46,7 @@ class QueryRequest(BaseModel):
     user_id: str
     query: str
 
-@@app.post("/imp")
+@app.post("/imp")
 async def imp_resume_handler(
         file: Annotated[UploadFile, File()],
         user_id: Annotated[str, Form()]):
