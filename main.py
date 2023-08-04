@@ -46,11 +46,26 @@ class QueryRequest(BaseModel):
     user_id: str
     query: str
 
-@app.post("/imp")
-def imp_resume_handler(imp_data: ImproveRequest):
+@@app.post("/imp")
+async def imp_resume_handler(
+        file: Annotated[UploadFile, File()],
+        user_id: Annotated[str, Form()]):
     messages = []
-    pdf_text = imp_data.file
-    messages.append({"role": "user", "content": f'Создай простой шаблон для резюме и заполни его этими данными "{pdf_text}"'})
+    pdf_file_bytes = await file.read()
+    pdf_reader = PyPDF2.PdfReader(io.BytesIO(pdf_file_bytes))
+
+    # Инициализируем переменную для хранения текста из всех страниц
+    all_text = ""
+
+    # Получаем количество страниц в документе
+    num_pages = len(pdf_reader.pages)
+
+    # Читаем содержимое каждой страницы и добавляем в переменную all_text
+    for page_num in range(num_pages):
+        page = pdf_reader.pages[page_num]
+        all_text += page.extract_text()
+    message = all_text
+    messages.append({"role": "user", "content": f'Создай простой шаблон для резюме и заполни его этими данными "{message}"'})
     chat = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages = messages)
     reply = chat.choices[0].message.content
     messages.append({"role":"assistant", "content": reply})
