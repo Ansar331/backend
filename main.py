@@ -69,12 +69,12 @@ async def imp_resume_handler(
     chat = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages = messages)
     reply = chat.choices[0].message.content
     messages.append({"role":"assistant", "content": reply})
-    if imp_data.user_id == '':
+    if user_id == '':
         characters = string.ascii_letters + string.digits
         random_word = ''.join(random.choice(characters) for _ in range(13))
         save_query(QueryRequest(user_id=random_word, query=reply))  # Используем query=reply
     else:
-        save_query(QueryRequest(user_id=imp_data.user_id, query=reply))  # Используем query=reply
+        save_query(QueryRequest(user_id=user_id, query=reply))  # Используем query=reply
 
     # Return the processed data
     return {"message": reply}
