@@ -65,7 +65,7 @@ async def imp_resume_handler(
         page = pdf_reader.pages[page_num]
         all_text += page.extract_text()
     message = all_text
-    messages.append({"role": "user", "content": f'Создай простой шаблон для резюме и заполни его этими данными "{message}"'})
+    messages.append({"role": "user", "content": f'Создай простой шаблон для резюме и заполни его на английском этими данными "{message}"'})
     chat = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages = messages)
     reply = chat.choices[0].message.content
     messages.append({"role":"assistant", "content": reply})
