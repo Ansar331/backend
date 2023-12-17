@@ -203,7 +203,7 @@ async def analyze_resume_handler(
         save_query(QueryRequest(user_id=user_id, query=reply))  # Используем query=reply
 
     # Return the processed data
-    return {"message": reply, "score": numbers[0]}
+    return {"message": reply, "score": numbers[0] - 30}
     
 @app.get("/queries/{user_id}")
 def get_queries(user_id: str):
